@@ -1,0 +1,50 @@
+package com.sample
+ 
+import com.sample.DroolsTest.Message;
+ 
+rule "Hello World"
+    when
+        m : Message( status == Message.HELLO, myMessage : message )
+    then
+        System.out.println( myMessage );
+        m.setMessage( "Goodbye cruel world" );
+        m.setStatus( Message.GOODBYE );
+        update( m );
+end
+
+rule "GoodBye"
+    when
+        Message( status == Message.GOODBYE, myMessage : message )
+    then
+        System.out.println( myMessage );
+end
+
+//Timer gives following error in Rete Tree viewer: 
+//Rete Tree Build Error!
+//Reason:
+//org.drools.core.RuntimeDroolsException:
+//java.lang.reflect.InvocationTargetException: [Rete(0)]
+rule "GoodBye-Timer"
+	timer (int: 10s)
+	when 
+		m : Message( status == Message.GOODBYE)
+	then 
+		System.out.println("Retracting our GOODBYE message.");
+		retract(m);
+	end
+
+// Using '||' operator as shown below gives the following error in Rete Tree vieuwer:
+//Rete Tree Build Error!
+//Reason:
+//java.lang.NullPointerException: null
+rule "Hello World-Or"
+	when
+		m: Message( status == Message.HELLO, (message == "Test" || message == "AnotherTest"))
+	then
+		System.out.println("This gives an error in the Rete Tree viewer.");
+	end  
+
+
+
+
+
